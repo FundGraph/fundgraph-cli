@@ -15,13 +15,13 @@ Usage:
   fundgraph version
   fundgraph --help
 
-Phase 2 input:
+Input:
   PATH may be a project directory (npm, PyPI, or Cargo), a JSON file
   containing versioned FundGraph models, or -/omitted for stdin.
 
 Options:
   --format text|json  Select output format (default: text)
-  --offline           Prohibit network access (Phase 2 performs no network access)
+  --offline           Use only local input and do not enable network access
   --strict            Treat invalid models as an invalid-input failure
   -h, --help          Show this help
   -v, --version       Show the CLI version
@@ -49,7 +49,7 @@ function readInput(inputPath: string): string {
     throw new FundGraphCliError('INVALID_INPUT', `Input path does not exist: ${inputPath}`);
   }
   if (!stats.isFile()) {
-    throw new FundGraphCliError('INVALID_INPUT', 'Phase 2 accepts a JSON model file, not a directory. Dependency discovery starts in Phase 3.');
+    throw new FundGraphCliError('INVALID_INPUT', 'Input must be a JSON model file or a supported project directory.');
   }
   if (stats.size > MAX_INPUT_BYTES) {
     throw new FundGraphCliError('INPUT_TOO_LARGE', `Input exceeds ${MAX_INPUT_BYTES} bytes`);
@@ -160,7 +160,7 @@ function renderText(result: AnalysisResult): string {
     `Models: ${result.modelCount}`,
     `Edges: ${result.edgeCount}`,
     ...(result.ecosystems.length > 0 ? [`Ecosystems: ${result.ecosystems.join(', ')}`] : []),
-    `Offline: ${result.offline ? 'yes' : 'yes (Phase 2 has no network providers)'}`,
+    `Offline: ${result.offline ? 'yes' : 'yes (current directory analysis has no live network providers)'}`,
   ];
   for (const [kind, count] of Object.entries(result.counts).sort(([a], [b]) => a.localeCompare(b))) lines.push(`  ${kind}: ${count}`);
   if (result.diagnostics.length > 0) {
