@@ -5,8 +5,23 @@
   "license": "MIT",
   "type": "module",
   "private": false,
+  "bin": {
+    "fundgraph": "./dist/main.js"
+  },
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "@fundgraph/core": "0.1.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test test/cli.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.8.0",
+    "typescript": "^5.9.2"
   }
 }
 
