@@ -26,6 +26,9 @@ jobs:
         with:
           repository: ${{ github.repository_owner }}/fundgraph-core
           path: fundgraph-core
+      - name: Build sibling core package
+        working-directory: fundgraph-core
+        run: npm install --ignore-scripts --no-save && npm run build
       - name: Install sibling core package
         run: npm install --ignore-scripts --no-save ./fundgraph-core
       - run: npm run lint
@@ -47,6 +50,9 @@ jobs:
         with:
           repository: ${{ github.repository_owner }}/fundgraph-core
           path: fundgraph-core
+      - name: Build sibling core package
+        working-directory: fundgraph-core
+        run: npm install --ignore-scripts --no-save && npm run build
       - run: npm install --ignore-scripts --no-save ./fundgraph-core
       - run: npm run build
       - run: npm pack
