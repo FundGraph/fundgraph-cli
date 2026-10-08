@@ -11,6 +11,8 @@ jobs:
   verify:
     name: verify (${{ matrix.os }}, Node ${{ matrix.node }})
     runs-on: ${{ matrix.os }}
+    env:
+      FUNDGRAPH_CORE_FIXTURES: fundgraph-core/test/fixtures
     strategy:
       fail-fast: false
       matrix:

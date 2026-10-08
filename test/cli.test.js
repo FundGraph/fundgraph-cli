@@ -3,11 +3,13 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { writeFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const entry = fileURLToPath(new URL('../dist/main.js', import.meta.url));
-const coreFixtures = fileURLToPath(new URL('../../fundgraph-core/test/fixtures/', import.meta.url));
+const coreFixtures = process.env.FUNDGRAPH_CORE_FIXTURES
+  ? resolve(process.env.FUNDGRAPH_CORE_FIXTURES)
+  : fileURLToPath(new URL('../../fundgraph-core/test/fixtures/', import.meta.url));
 const runCli = (args, input) => spawnSync(process.execPath, [entry, ...args], { input, encoding: 'utf8' });
 const model = { schemaVersion: '1.0', kind: 'Project', id: 'project:test', name: 'test', rootPath: '.', ecosystems: ['npm'], dependencyIds: [] };
 
@@ -74,4 +76,3 @@ test('invalid arguments and strict model validation return meaningful failures',
   assert.equal(strict.status, 2);
   assert.match(strict.stderr, /INVALID_INPUT/);
 });
-
