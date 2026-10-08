@@ -38,6 +38,18 @@ test('analyze reads a bounded file path and emits text', () => {
   assert.match(result.stdout, /Project: 1/);
 });
 
+test('analyze discovers a supported project directory through core', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'fundgraph-project-'));
+  writeFileSync(join(directory, 'package.json'), JSON.stringify({ name: 'fixture-project', dependencies: { demo: '^1.0.0' } }));
+  writeFileSync(join(directory, 'package-lock.json'), JSON.stringify({ lockfileVersion: 3, packages: { '': {}, 'node_modules/demo': { version: '1.2.0' } } }));
+  const result = runCli(['analyze', directory, '--format=json', '--offline']);
+  assert.equal(result.status, 0);
+  const output = JSON.parse(result.stdout);
+  assert.equal(output.ecosystems[0], 'npm');
+  assert.equal(output.modelCount, 1);
+  assert.equal(output.edgeCount, 1);
+});
+
 test('invalid arguments and strict model validation return meaningful failures', () => {
   const usage = runCli(['unknown']);
   assert.equal(usage.status, 2);

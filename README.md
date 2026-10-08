@@ -8,7 +8,7 @@ The project-level source of truth is in the sibling [`fundgraph`](../fundgraph/R
 
 ## Phase 2 command surface
 
-The CLI is implemented and currently accepts a JSON model document as either a file path or stdin. The document is an array of versioned FundGraph models or an object with a `models` array. Dependency discovery from project manifests begins in Phase 3.
+The CLI is implemented and accepts a supported project directory, a JSON model document as a file path, or stdin. Directory analysis currently discovers npm, PyPI, and Cargo dependencies through `@fundgraph/core`; registry metadata and funding analysis remain later phases.
 
 ```text
 fundgraph --help
