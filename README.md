@@ -16,7 +16,7 @@ fundgraph version
 fundgraph analyze [PATH] [--format text|json] [--offline] [--strict]
 ```
 
-Use `-` or omit `PATH` to read stdin. `--offline` is explicit and current discovery performs no network access. Model-document and directory analysis both emit the core deterministic report: text mode shows it after the compatibility summary, while JSON mode adds it under `report`. Default mode reports invalid models as diagnostics with exit code `1`; `--strict` returns invalid-input exit code `2`. Usage and input errors return `2`; unexpected failures return `3`.
+Use `-` or omit `PATH` to read stdin. `--offline` is explicit and current discovery performs no network access. Model-document and directory analysis both emit the core deterministic report: text mode shows it after the compatibility summary, while JSON mode adds it under `report`. The CLI does not silently enable live network calls; callers that need network-assisted workflows use the core `NetworkClient` with explicit cache and offline options. Default mode reports invalid models as diagnostics with exit code `1`; `--strict` returns invalid-input exit code `2`. Usage and input errors return `2`; unexpected failures return `3`.
 
 Development commands:
 
