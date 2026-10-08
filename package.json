@@ -1,0 +1,12 @@
+{
+  "name": "fundgraph",
+  "version": "0.1.0",
+  "description": "CLI for evidence-first dependency funding analysis",
+  "license": "MIT",
+  "type": "module",
+  "private": false,
+  "dependencies": {
+    "@fundgraph/core": "0.1.0"
+  }
+}
+
