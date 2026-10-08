@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const entry = fileURLToPath(new URL('../dist/main.js', import.meta.url));
+const coreFixtures = fileURLToPath(new URL('../../fundgraph-core/test/fixtures/', import.meta.url));
 const runCli = (args, input) => spawnSync(process.execPath, [entry, ...args], { input, encoding: 'utf8' });
 const model = { schemaVersion: '1.0', kind: 'Project', id: 'project:test', name: 'test', rootPath: '.', ecosystems: ['npm'], dependencyIds: [] };
 
@@ -48,6 +49,17 @@ test('analyze discovers a supported project directory through core', () => {
   assert.equal(output.ecosystems[0], 'npm');
   assert.equal(output.modelCount, 1);
   assert.equal(output.edgeCount, 1);
+  assert.equal(output.report.kind, 'FundGraphReport');
+});
+
+test('analyze smoke-tests the shared npm workspace fixture and emits a report', () => {
+  const result = runCli(['analyze', join(coreFixtures, 'npm-workspace'), '--format=json', '--offline']);
+  assert.equal(result.status, 0);
+  const output = JSON.parse(result.stdout);
+  assert.equal(output.ecosystems[0], 'npm');
+  assert.equal(output.report.kind, 'FundGraphReport');
+  assert.equal(output.report.schemaVersion, '1.0');
+  assert.ok(output.report.summary.dependencyCount >= 3);
 });
 
 test('invalid arguments and strict model validation return meaningful failures', () => {
