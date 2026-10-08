@@ -24,11 +24,14 @@ Development commands:
 
 ```text
 npm install
+npm run lint
 npm run typecheck
 npm test
 npm run build
 npm pack --dry-run
 ```
+
+CI verifies Ubuntu, Windows, and macOS on Node 20 and Node 22. It installs the sibling `fundgraph-core` repository before testing and uploads a package artifact without publishing it.
 
 For local sibling development before `@fundgraph/core` is published, build the core repository first, then install it without changing this package's published dependency contract:
 
