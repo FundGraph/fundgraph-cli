@@ -1,6 +1,6 @@
 import { readFileSync, statSync } from 'node:fs';
 import { stderr, stdout } from 'node:process';
-import { discoverDependencies, validateModel, type FundGraphModel } from '@fundgraph/core';
+import { createReport, discoverDependencies, renderReportText, validateModel, type FundGraphModel, type ReportDocument } from '@fundgraph/core';
 import { FundGraphCliError, parseArguments, type CliOptions } from './options.js';
 
 export const CLI_VERSION = '0.1.0';
@@ -37,6 +37,7 @@ interface AnalysisResult {
   ecosystems: string[];
   counts: Record<string, number>;
   diagnostics: Array<{ code: string; message: string; index?: number; sourcePath?: string }>;
+  report: ReportDocument;
 }
 
 function readInput(inputPath: string): string {
@@ -70,6 +71,33 @@ function extractModels(parsed: unknown): unknown[] {
   throw new FundGraphCliError('INVALID_INPUT', 'JSON input must be an array of models or an object containing a models array');
 }
 
+function reportForModels(models: readonly FundGraphModel[], diagnostics: AnalysisResult['diagnostics']): ReportDocument {
+  const grouped = {
+    Project: [] as Extract<FundGraphModel, { kind: 'Project' }>[],
+    Dependency: [] as Extract<FundGraphModel, { kind: 'Dependency' }>[],
+    Package: [] as Extract<FundGraphModel, { kind: 'Package' }>[],
+    Registry: [] as Extract<FundGraphModel, { kind: 'Registry' }>[],
+    Repository: [] as Extract<FundGraphModel, { kind: 'Repository' }>[],
+    FundingSource: [] as Extract<FundGraphModel, { kind: 'FundingSource' }>[],
+    Evidence: [] as Extract<FundGraphModel, { kind: 'Evidence' }>[],
+    Confidence: [] as Extract<FundGraphModel, { kind: 'Confidence' }>[],
+    Relationship: [] as Extract<FundGraphModel, { kind: 'Relationship' }>[]
+  };
+  for (const model of models) grouped[model.kind].push(model as never);
+  const project = grouped.Project[0];
+  return createReport({
+    ...(project ? { project } : {}),
+    dependencies: grouped.Dependency,
+    packages: grouped.Package,
+    registries: grouped.Registry,
+    repositories: grouped.Repository,
+    fundingSources: grouped.FundingSource,
+    evidence: grouped.Evidence,
+    relationships: grouped.Relationship,
+    diagnostics,
+  });
+}
+
 function analyze(options: CliOptions): AnalysisResult {
   if (options.inputPath !== '-') {
     try {
@@ -77,6 +105,7 @@ function analyze(options: CliOptions): AnalysisResult {
         const discovered = discoverDependencies(options.inputPath);
         const diagnostics = discovered.diagnostics.map((item) => ({ code: item.code, message: item.message, ...(item.sourcePath === undefined ? {} : { sourcePath: item.sourcePath }) }));
         if (options.strict && diagnostics.length > 0) throw new FundGraphCliError('INVALID_INPUT', `${diagnostics.length} discovery diagnostic(s) reported`);
+        const report = createReport({ project: discovered.project, dependencies: discovered.graph.nodes, diagnostics });
         return {
           schemaVersion: '1.0',
           input: options.inputPath,
@@ -87,6 +116,7 @@ function analyze(options: CliOptions): AnalysisResult {
           ecosystems: discovered.ecosystems,
           counts: { Dependency: discovered.graph.nodes.length },
           diagnostics,
+          report,
         };
       }
     } catch (error) {
@@ -119,7 +149,8 @@ function analyze(options: CliOptions): AnalysisResult {
   }
   const counts: Record<string, number> = {};
   for (const model of validModels) counts[model.kind] = (counts[model.kind] ?? 0) + 1;
-  return { schemaVersion: '1.0', input: options.inputPath, offline: options.offline, strict: options.strict, modelCount: validModels.length, edgeCount: 0, ecosystems: [], counts, diagnostics };
+  const report = reportForModels(validModels, diagnostics);
+  return { schemaVersion: '1.0', input: options.inputPath, offline: options.offline, strict: options.strict, modelCount: validModels.length, edgeCount: 0, ecosystems: [], counts, diagnostics, report };
 }
 
 function renderText(result: AnalysisResult): string {
@@ -136,7 +167,7 @@ function renderText(result: AnalysisResult): string {
     lines.push(`Diagnostics: ${result.diagnostics.length}`);
     for (const diagnostic of result.diagnostics) lines.push(`  [${diagnostic.code}] model ${diagnostic.index}: ${diagnostic.message}`);
   }
-  return `${lines.join('\n')}\n`;
+  return `${lines.join('\n')}\n\n${renderReportText(result.report)}`;
 }
 
 export function run(argv: readonly string[]): number {

@@ -6,7 +6,7 @@ It will own command parsing, terminal output, configuration, exit codes, CLI-spe
 
 The project-level source of truth is in the sibling [`fundgraph`](../fundgraph/README.md) repository. The reusable library is in [`fundgraph-core`](../fundgraph-core/README.md). The dependency direction is `fundgraph-cli` → `fundgraph-core` through a released package version.
 
-## Phase 2 command surface
+## Command surface and reports
 
 The CLI is implemented and accepts a supported project directory, a JSON model document as a file path, or stdin. Directory analysis currently discovers npm, PyPI, and Cargo dependencies through `@fundgraph/core`; registry metadata and funding analysis remain later phases.
 
@@ -16,7 +16,7 @@ fundgraph version
 fundgraph analyze [PATH] [--format text|json] [--offline] [--strict]
 ```
 
-Use `-` or omit `PATH` to read stdin. `--offline` is explicit and Phase 2 performs no network access. Default mode reports invalid models as diagnostics with exit code `1`; `--strict` returns invalid-input exit code `2`. Usage and input errors return `2`; unexpected failures return `3`.
+Use `-` or omit `PATH` to read stdin. `--offline` is explicit and current discovery performs no network access. Model-document and directory analysis both emit the core deterministic report: text mode shows it after the compatibility summary, while JSON mode adds it under `report`. Default mode reports invalid models as diagnostics with exit code `1`; `--strict` returns invalid-input exit code `2`. Usage and input errors return `2`; unexpected failures return `3`.
 
 Development commands:
 
