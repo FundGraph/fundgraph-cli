@@ -1,0 +1,25 @@
+name: CLI bug report
+description: Report a reproducible fundgraph-cli defect
+title: "bug(cli): "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Include the exact command, sanitized input or fixture, expected result, and actual result.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node version, package version, and commit
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: Redact credentials and private paths.

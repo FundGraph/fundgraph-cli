@@ -31,6 +31,9 @@ npm run build
 npm pack --dry-run
 ```
 
+See the sibling [`fundgraph` contributor guide](../fundgraph/docs/CONTRIBUTOR_GUIDE.md) and
+[`COMPATIBILITY_POLICY.md`](../fundgraph/docs/COMPATIBILITY_POLICY.md) before changing the command contract.
+
 CI verifies Ubuntu, Windows, and macOS on Node 20 and Node 22. It installs the sibling `fundgraph-core` repository before testing and uploads a package artifact without publishing it.
 
 For local sibling development before `@fundgraph/core` is published, build the core repository first, then install it without changing this package's published dependency contract:
