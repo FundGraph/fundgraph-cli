@@ -8,7 +8,7 @@ The project-level source of truth is in the sibling [`fundgraph`](../fundgraph/R
 
 ## Command surface and reports
 
-The CLI is implemented and accepts a supported project directory, a JSON model document as a file path, or stdin. Directory analysis currently discovers npm, PyPI, and Cargo dependencies through `@fundgraph/core`; registry metadata and funding analysis remain later phases.
+The CLI is implemented and accepts a supported project directory, a JSON model document as a file path, or stdin. Directory analysis discovers npm, PyPI, Cargo, and baseline Go module dependencies through `@fundgraph/core`; registry metadata and funding analysis for Go remain outside the current scope.
 
 ```text
 fundgraph --help
