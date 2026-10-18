@@ -14,18 +14,19 @@ The command-line interface for local dependency discovery and deterministic text
 ## Current scope
 
 `fundgraph analyze` reads a supported project directory, a JSON model file, or JSON from stdin. Directory discovery
-supports npm, PyPI, Cargo, and baseline Go `go.mod` requirements. The command runs locally and does not make hidden
-network requests.
+supports npm, PyPI, Cargo, and baseline Go `go.mod` requirements. The default directory mode is local-only. Add
+`--network` to explicitly fetch public npm, PyPI, or crates.io metadata and produce the complete evidence-backed
+funding report. Go remains discovery-only because Go metadata and funding providers are not implemented.
 
-The core library also has recorded metadata/funding parsers and relationship APIs, but the CLI does not yet orchestrate
-those stages for arbitrary projects. Funding analysis is therefore not part of the current directory command output.
+The CLI now orchestrates those stages for arbitrary npm, PyPI, and Cargo projects when `--network` is explicitly
+supplied. Default directory analysis remains local-only; Go is discovery-only.
 
 ## Commands
 
 ```text
 fundgraph --help
 fundgraph version
-fundgraph analyze [PATH] [--format text|json] [--offline] [--strict]
+fundgraph analyze [PATH] [--format text|json] [--offline|--network] [--strict]
 ```
 
 `PATH` defaults to the current directory. Use `-` or omit the path to read JSON from stdin. `--offline` makes the local
@@ -39,7 +40,7 @@ only behavior explicit. `--strict` treats invalid model input as an error.
 | `3` | Unexpected internal failure |
 
 JSON output keeps the compatibility summary fields and includes the versioned core report under `report`. Text output
-prints the summary and deterministic report.
+prints the summary and deterministic report. `--network` is opt-in and uses the core network policy.
 
 ## Try it from the workspace
 
@@ -56,6 +57,7 @@ npm run build
 node dist/main.js --help
 node dist/main.js analyze ../fundgraph-core/test/fixtures/npm-workspace --format text --offline
 node dist/main.js analyze ../fundgraph-core/test/fixtures/npm-workspace --format json --offline
+node dist/main.js analyze ./my-project --format json --network
 ```
 
 After compatible npm packages are published, install and run it with:
@@ -68,7 +70,7 @@ fundgraph analyze ./my-project --format text --offline
 ## Ownership and safety
 
 - This repository owns argument parsing, terminal output, CLI errors, and process exit codes.
-- `fundgraph-core` owns dependency models, parsing, evidence, and relationship logic.
+- `fundgraph-core` owns dependency models, parsing, evidence, relationship logic, and opt-in project orchestration.
 - Input files are bounded and treated as data; the CLI does not execute project code.
 - The command does not identify maintainers, endorse funding destinations, manage wallets, or execute payments.
 

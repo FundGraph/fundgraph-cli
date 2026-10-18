@@ -1,6 +1,6 @@
 import { readFileSync, statSync } from 'node:fs';
 import { stderr, stdout } from 'node:process';
-import { createReport, discoverDependencies, renderReportText, validateModel, type FundGraphModel, type ReportDocument } from '@fundgraph/core';
+import { analyzeProject, createReport, discoverDependencies, renderReportText, validateModel, type FundGraphModel, type ReportDocument } from '@fundgraph/core';
 import { FundGraphCliError, parseArguments, type CliOptions } from './options.js';
 
 export const CLI_VERSION = '0.1.0';
@@ -11,7 +11,7 @@ const HELP = `FundGraph ${CLI_VERSION}
 Analyze a JSON model document and explain its validated model inventory.
 
 Usage:
-  fundgraph analyze [PATH] [--format text|json] [--offline] [--strict]
+  fundgraph analyze [PATH] [--format text|json] [--offline|--network] [--strict]
   fundgraph version
   fundgraph --help
 
@@ -22,6 +22,7 @@ Input:
 Options:
   --format text|json  Select output format (default: text)
   --offline           Use only local input and do not enable network access
+  --network           Fetch public registry metadata and parse declared funding evidence
   --strict            Treat invalid models as an invalid-input failure
   -h, --help          Show this help
   -v, --version       Show the CLI version
@@ -32,6 +33,7 @@ interface AnalysisResult {
   input: string;
   offline: boolean;
   strict: boolean;
+  network: boolean;
   modelCount: number;
   edgeCount: number;
   ecosystems: string[];
@@ -98,10 +100,21 @@ function reportForModels(models: readonly FundGraphModel[], diagnostics: Analysi
   });
 }
 
-function analyze(options: CliOptions): AnalysisResult {
+async function analyze(options: CliOptions): Promise<AnalysisResult> {
   if (options.inputPath !== '-') {
     try {
       if (statSync(options.inputPath).isDirectory()) {
+        if (options.network) {
+          const analyzed = await analyzeProject(options.inputPath);
+          const diagnostics = analyzed.report.diagnostics;
+          return {
+            schemaVersion: '1.0', input: options.inputPath, offline: false, strict: options.strict,
+            network: true,
+            modelCount: analyzed.report.summary.dependencyCount, edgeCount: analyzed.discovery.graph.edges.length,
+            ecosystems: analyzed.discovery.ecosystems, counts: { Dependency: analyzed.report.summary.dependencyCount, Package: analyzed.report.summary.packageCount, FundingSource: analyzed.report.summary.fundingSourceCount, Relationship: analyzed.report.summary.relationshipCount },
+            diagnostics, report: analyzed.report,
+          };
+        }
         const discovered = discoverDependencies(options.inputPath);
         const diagnostics = discovered.diagnostics.map((item) => ({ code: item.code, message: item.message, ...(item.sourcePath === undefined ? {} : { sourcePath: item.sourcePath }) }));
         if (options.strict && diagnostics.length > 0) throw new FundGraphCliError('INVALID_INPUT', `${diagnostics.length} discovery diagnostic(s) reported`);
@@ -111,6 +124,7 @@ function analyze(options: CliOptions): AnalysisResult {
           input: options.inputPath,
           offline: options.offline,
           strict: options.strict,
+          network: false,
           modelCount: discovered.graph.nodes.length,
           edgeCount: discovered.graph.edges.length,
           ecosystems: discovered.ecosystems,
@@ -150,7 +164,7 @@ function analyze(options: CliOptions): AnalysisResult {
   const counts: Record<string, number> = {};
   for (const model of validModels) counts[model.kind] = (counts[model.kind] ?? 0) + 1;
   const report = reportForModels(validModels, diagnostics);
-  return { schemaVersion: '1.0', input: options.inputPath, offline: options.offline, strict: options.strict, modelCount: validModels.length, edgeCount: 0, ecosystems: [], counts, diagnostics, report };
+  return { schemaVersion: '1.0', input: options.inputPath, offline: options.offline, strict: options.strict, network: false, modelCount: validModels.length, edgeCount: 0, ecosystems: [], counts, diagnostics, report };
 }
 
 function renderText(result: AnalysisResult): string {
@@ -160,7 +174,7 @@ function renderText(result: AnalysisResult): string {
     `Models: ${result.modelCount}`,
     `Edges: ${result.edgeCount}`,
     ...(result.ecosystems.length > 0 ? [`Ecosystems: ${result.ecosystems.join(', ')}`] : []),
-    `Offline: ${result.offline ? 'yes' : 'yes (current directory analysis has no live network providers)'}`,
+    `Network: ${result.network ? 'enabled (public metadata only)' : 'disabled'}`,
   ];
   for (const [kind, count] of Object.entries(result.counts).sort(([a], [b]) => a.localeCompare(b))) lines.push(`  ${kind}: ${count}`);
   if (result.diagnostics.length > 0) {
@@ -170,7 +184,7 @@ function renderText(result: AnalysisResult): string {
   return `${lines.join('\n')}\n\n${renderReportText(result.report)}`;
 }
 
-export function run(argv: readonly string[]): number {
+export async function run(argv: readonly string[]): Promise<number> {
   try {
     const parsed = parseArguments(argv);
     if (parsed.command === 'help') {
@@ -181,7 +195,7 @@ export function run(argv: readonly string[]): number {
       stdout.write(`${CLI_VERSION}\n`);
       return 0;
     }
-    const result = analyze(parsed.options);
+    const result = await analyze(parsed.options);
     stdout.write(parsed.options.format === 'json' ? `${JSON.stringify(result, null, 2)}\n` : renderText(result));
     return result.diagnostics.length > 0 ? 1 : 0;
   } catch (error) {
@@ -192,5 +206,5 @@ export function run(argv: readonly string[]): number {
   }
 }
 
-if (process.argv[1]) process.exitCode = run(process.argv.slice(2));
+if (process.argv[1]) run(process.argv.slice(2)).then((code) => { process.exitCode = code; });
 
