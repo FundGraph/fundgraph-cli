@@ -1,22 +1,45 @@
 {
   "name": "fundgraph",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "CLI for evidence-first dependency funding analysis",
   "license": "MIT",
   "type": "module",
   "private": false,
-  "bin": "./dist/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FundGraph/fundgraph-cli.git"
+  },
+  "homepage": "https://github.com/FundGraph/fundgraph-cli#readme",
+  "bugs": {
+    "url": "https://github.com/FundGraph/fundgraph-cli/issues"
+  },
+  "keywords": [
+    "dependency-analysis",
+    "open-source-funding",
+    "cli",
+    "provenance",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "fundgraph": "dist/main.js"
+  },
   "files": [
     "dist"
   ],
   "dependencies": {
-    "@fundgraph/core": "0.1.0"
+    "@fundgraph/core": "0.1.1"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "node scripts/lint.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "npm run build && node --test test/cli.test.js"
+    "test": "npm run build && node --test test/cli.test.js test/package.test.js"
   },
   "devDependencies": {
     "@types/node": "^26.6.4",

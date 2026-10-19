@@ -44,7 +44,15 @@ prints the summary and deterministic report. `--network` is opt-in and uses the 
 
 ## Try it from the workspace
 
-The CLI package is not published yet. Run these commands from the `fundgraph-cli` repository directory:
+For normal use, install the published CLI package:
+
+```sh
+npm install -g fundgraph@0.1.2
+fundgraph --version
+fundgraph analyze ./my-project --format text --offline
+```
+
+For repository development, run these commands from the `fundgraph-cli` repository directory:
 
 ```sh
 cd ../fundgraph-core
@@ -58,13 +66,6 @@ node dist/main.js --help
 node dist/main.js analyze ../fundgraph-core/test/fixtures/npm-workspace --format text --offline
 node dist/main.js analyze ../fundgraph-core/test/fixtures/npm-workspace --format json --offline
 node dist/main.js analyze ./my-project --format json --network
-```
-
-After compatible npm packages are published, install and run it with:
-
-```sh
-npm install -g fundgraph
-fundgraph analyze ./my-project --format text --offline
 ```
 
 ## Ownership and safety
