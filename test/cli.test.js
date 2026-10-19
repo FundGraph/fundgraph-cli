@@ -20,7 +20,7 @@ test('help and version commands are stable', () => {
   assert.match(help.stdout, /--network/);
   const version = runCli(['version']);
   assert.equal(version.status, 0);
-  assert.equal(version.stdout, '0.1.1\n');
+  assert.equal(version.stdout, '0.1.2\n');
 });
 
 test('analyze reads stdin and emits JSON', () => {
