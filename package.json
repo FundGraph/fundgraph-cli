@@ -5,9 +5,7 @@
   "license": "MIT",
   "type": "module",
   "private": false,
-  "bin": {
-    "fundgraph": "./dist/main.js"
-  },
+  "bin": "./dist/main.js",
   "files": [
     "dist"
   ],
