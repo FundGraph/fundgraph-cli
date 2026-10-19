@@ -1,9 +1,11 @@
+#!/usr/bin/env node
+
 import { readFileSync, statSync } from 'node:fs';
 import { stderr, stdout } from 'node:process';
 import { analyzeProject, createReport, discoverDependencies, renderReportText, validateModel, type FundGraphModel, type ReportDocument } from '@fundgraph/core';
 import { FundGraphCliError, parseArguments, type CliOptions } from './options.js';
 
-export const CLI_VERSION = '0.1.0';
+export const CLI_VERSION = '0.1.1';
 export const MAX_INPUT_BYTES = 1_048_576;
 
 const HELP = `FundGraph ${CLI_VERSION}
