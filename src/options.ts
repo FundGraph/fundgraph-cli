@@ -4,6 +4,7 @@ export interface CliOptions {
   inputPath: string;
   format: OutputFormat;
   offline: boolean;
+  network: boolean;
   strict: boolean;
 }
 
@@ -32,6 +33,7 @@ export function parseArguments(argv: readonly string[]): ParsedCommand {
   let inputPath = '-';
   let format: OutputFormat = 'text';
   let offline = false;
+  let network = false;
   let strict = false;
   let pathSeen = false;
   for (let index = 1; index < argv.length; index += 1) {
@@ -39,6 +41,10 @@ export function parseArguments(argv: readonly string[]): ParsedCommand {
     if (argument === '--help' || argument === '-h') return { command: 'help' };
     if (argument === '--offline') {
       offline = true;
+      continue;
+    }
+    if (argument === '--network') {
+      network = true;
       continue;
     }
     if (argument === '--strict') {
@@ -62,6 +68,7 @@ export function parseArguments(argv: readonly string[]): ParsedCommand {
     inputPath = argument ?? '-';
     pathSeen = true;
   }
-  return { command: 'analyze', options: { inputPath, format, offline, strict } };
+  if (offline && network) throw new FundGraphCliError('USAGE', '--offline and --network cannot be combined');
+  return { command: 'analyze', options: { inputPath, format, offline, network, strict } };
 }
 

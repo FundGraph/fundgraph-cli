@@ -17,6 +17,7 @@ test('help and version commands are stable', () => {
   const help = runCli(['--help']);
   assert.equal(help.status, 0);
   assert.match(help.stdout, /fundgraph analyze/);
+  assert.match(help.stdout, /--network/);
   const version = runCli(['version']);
   assert.equal(version.status, 0);
   assert.equal(version.stdout, '0.1.0\n');
