@@ -8,18 +8,19 @@
 
 # fundgraph-cli
 
-The command-line interface for local dependency discovery and deterministic text or JSON reports. It uses
-`@fundgraph/core` for models and analysis; it does not duplicate domain logic.
+The command-line interface for reviewing dependency funding evidence in deterministic text or JSON reports. It uses
+`@fundgraph/core` for discovery, provenance, and analysis; it does not duplicate domain logic.
 
 ## Current scope
 
-`fundgraph analyze` reads a supported project directory, a JSON model file, or JSON from stdin. Directory discovery
-supports npm, PyPI, Cargo, and baseline Go `go.mod` requirements. The default directory mode is local-only. Add
-`--network` to explicitly fetch public npm, PyPI, or crates.io metadata and produce the complete evidence-backed
-funding report. Go remains discovery-only because Go metadata and funding providers are not implemented.
+`fundgraph analyze` reads a supported project directory, a JSON model file, or JSON from stdin. Directory discovery is
+the input boundary for npm, PyPI, Cargo, and baseline Go `go.mod` requirements. The default directory mode is local-only.
+Add `--network` to explicitly fetch public npm, PyPI, or crates.io metadata and produce the evidence-backed funding
+report. Go remains discovery-only because Go metadata and funding providers are not implemented.
 
 The CLI now orchestrates those stages for arbitrary npm, PyPI, and Cargo projects when `--network` is explicitly
-supplied. Default directory analysis remains local-only; Go is discovery-only.
+supplied. Registry and funding responses are point-in-time observations and may become stale; the report preserves their
+observation timestamps. Default directory analysis remains local-only; Go is discovery-only.
 
 ## Commands
 
