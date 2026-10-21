@@ -5,7 +5,7 @@ import { stderr, stdout } from 'node:process';
 import { analyzeProject, createReport, discoverDependencies, renderReportText, validateModel, type FundGraphModel, type ReportDocument } from '@fundgraph/core';
 import { FundGraphCliError, parseArguments, type CliOptions } from './options.js';
 
-export const CLI_VERSION = '0.1.2';
+export const CLI_VERSION = '0.1.3';
 export const MAX_INPUT_BYTES = 1_048_576;
 
 const HELP = `FundGraph ${CLI_VERSION}
