@@ -1,6 +1,6 @@
 {
   "name": "fundgraph",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "CLI for evidence-first dependency funding analysis",
   "license": "MIT",
   "type": "module",
@@ -33,7 +33,7 @@
     "dist"
   ],
   "dependencies": {
-    "@fundgraph/core": "0.1.1"
+    "@fundgraph/core": "0.1.2"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
