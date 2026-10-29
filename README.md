@@ -1,15 +1,30 @@
-<p align="center"><img src="assets/fundgraph-cli.svg" alt="FundGraph CLI: local dependency analysis from your terminal" width="100%"></p>
+# fundgraph-cli
+
+<p align="center"><img src="assets/fundgraph-cli-v1.svg" alt="FundGraph CLI: local dependency analysis from your terminal" width="100%"></p>
 
 <p align="center">
+  <a href="https://github.com/FundGraph/fundgraph-cli/actions/workflows/ci.yml"><img src="https://github.com/FundGraph/fundgraph-cli/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-56d6be?style=flat-square" alt="MIT license"></a>
   <img src="https://img.shields.io/badge/Node.js-20%20%7C%2022-83a8ff?style=flat-square" alt="Node.js 20 and 22">
   <img src="https://img.shields.io/badge/command-fundgraph-b6a9ff?style=flat-square" alt="fundgraph command">
 </p>
 
-# fundgraph-cli
-
 The command-line interface for reviewing dependency funding evidence in deterministic text or JSON reports. It uses
 `@fundgraph/core` for discovery, provenance, and analysis; it does not duplicate domain logic.
+
+## Repository role
+
+`fundgraph-cli` owns the `fundgraph` executable: command parsing, filesystem input, output rendering, exit codes,
+packaging, and CLI integration tests. The reusable models, evidence logic, and report semantics remain in
+[`fundgraph-core`](https://github.com/FundGraph/fundgraph-core).
+
+```mermaid
+flowchart LR
+  A[Project directory or JSON input] --> B[CLI parsing and boundaries]
+  B --> C[@fundgraph/core analysis]
+  C --> D[Deterministic text or JSON report]
+  D --> E[Exit code]
+```
 
 ## Current scope
 
@@ -88,3 +103,11 @@ npm pack --dry-run
 
 CI defines Ubuntu, Windows, and macOS jobs on Node 20 and 22. See [`CONTRIBUTING.md`](CONTRIBUTING.md) and the
 project-level `fundgraph` repository for the cross-repository roadmap and policies.
+
+## Related repositories and governance
+
+- [`fundgraph`](https://github.com/FundGraph/fundgraph) — project source of truth, roadmap, and release coordination.
+- [`fundgraph-core`](https://github.com/FundGraph/fundgraph-core) — reusable discovery, evidence, and report library.
+- [`SECURITY.md`](SECURITY.md) — security boundaries and reporting.
+- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) — community standards.
+- [`CHANGELOG.md`](CHANGELOG.md) — release and change history.
