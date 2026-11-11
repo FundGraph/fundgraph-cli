@@ -63,10 +63,13 @@ prints the summary and deterministic report. `--network` is opt-in and uses the 
 For normal use, install the published CLI package:
 
 ```sh
-npm install -g fundgraph@0.1.2
+npm install -g fundgraph@0.1.3
 fundgraph --version
 fundgraph analyze ./my-project --format text --offline
 ```
+
+For a fully public, fixture-backed verification that includes provenance and intentionally contradictory funding
+evidence, follow the [FundGraph public verification guide](https://github.com/FundGraph/fundgraph/blob/main/PUBLIC_VERIFICATION.md).
 
 For repository development, run these commands from the `fundgraph-cli` repository directory:
 
